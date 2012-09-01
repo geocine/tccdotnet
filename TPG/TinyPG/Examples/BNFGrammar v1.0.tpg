@@ -1,0 +1,47 @@
+// Tiny Parser Generator v1.0
+// Copyright © Herre Kuijpers 2008-2010
+// this grammar describes the BNF notation used by TinyPG
+// Terminals:
+BRACKETOPEN      	-> @"\(\s*";
+BRACKETCLOSE     	-> @"\s*\)";
+CODEBLOCK     	-> @"\s*\{[^\}]*\}([^};][^}]*\})*;";
+ATTRIBUTESKIP    	-> @"\s*\[Skip]\s*";
+PIPE             	-> @"\s*\|\s*";
+SEMICOLON        	-> @"\s*;";
+UNARYOPER         	-> @"\s*(\*|\+|\?)";
+IDENTIFIER        	-> @"[a-zA-Z_][a-zA-Z0-9_]*";
+ARROW             	-> @"\s*->\s*";
+EOF               	-> @"^\s*$";
+WHITESPACE        	-> @"\s+";
+REGEX             	-> @"@?\""(\""\""|[^\""])*\""";
+
+[Skip]
+COMMENTLINE       	-> @"//[^\n]*\n?";
+
+[Skip]
+COMMENTBLOCK      	-> @"\s+/\*[^*]*\*+(?:[^/*][^*]*\*+)*/";
+
+// Production lines LL(1):
+Start             	-> ( WHITESPACE* ExtProduction )* EOF;
+ExtProduction     	-> (Attribute)* Production;
+Attribute	      	-> ATTRIBUTESKIP;
+Production        	-> IDENTIFIER ARROW Rule (CODEBLOCK | SEMICOLON);
+Rule              	-> REGEX | Subrule;
+Subrule           	-> Symbol (BinaryOper Symbol )* ;
+Symbol            	-> (IDENTIFIER | BRACKETOPEN Subrule BRACKETCLOSE ) UNARYOPER? ;
+BinaryOper        	-> WHITESPACE | PIPE;
+
+/*
+First symbols:
+Start: WHITESPACE ATTRIBUTESKIP IDENTIFIER EOF 
+ExtProduction: ATTRIBUTESKIP IDENTIFIER 
+Attribute: ATTRIBUTESKIP 
+Production: IDENTIFIER 
+Rule: REGEX IDENTIFIER BRACKETOPEN UNARYOPER 
+Subrule: IDENTIFIER BRACKETOPEN UNARYOPER 
+Symbol: IDENTIFIER BRACKETOPEN UNARYOPER 
+BinaryOper: WHITESPACE PIPE 
+Statement: CODEBLOCK SEMICOLON 
+
+Skips symbols: COMMENTLINE COMMENTBLOCK
+*/

@@ -1,0 +1,10 @@
+1. Changed: Start -> Header+ GlobalDecl* EOF;
+   To:      Start -> Header* GlobalDecl* EOF;
+
+2. Fixed bug that causes an error when parsing functions with no params.
+   
+   Changed: Function 	 -> LPAREN (Parameters|VOID) RPAREN (SEMICOL|CodeBlock);
+	    Parameters 	 -> ((DATATYPE POINTER? IDENTIFIER ParArray?)(COMMA ((DATATYPE POINTER? IDENTIFIER ParArray?)|VARIABLEPARAMS))*)?;
+   
+   To:	    Function 	 -> LPAREN (Parameters|VOID)? RPAREN (SEMICOL|CodeBlock);
+	    Parameters 	 -> ((DATATYPE POINTER? IDENTIFIER ParArray?)(COMMA ((DATATYPE POINTER? IDENTIFIER ParArray?)|VARIABLEPARAMS))*);
